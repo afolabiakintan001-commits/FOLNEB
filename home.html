@@ -10,7 +10,7 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar">
+  <nav class="navbar" id="navbar">
     <div class="logo">
       <a href="home.html">
         <img src="assets/logo.svg" alt="WordPDF Logo">
@@ -26,7 +26,7 @@
   </nav>
 
   <!-- Hero Section -->
-  <section class="hero">
+  <section class="hero" id="hero">
     <h1>Convert Word to PDF Instantly</h1>
     <p>Fast, free, and secure Word to PDF converter right in your browser.</p>
     <a href="index.html" class="cta-button">Start Converting</a>
@@ -45,6 +45,14 @@
     <div class="feature">
       <h2>💻 Easy to Use</h2>
       <p>Just click, upload, and convert. No sign-up or extra software needed.</p>
+    </div>
+    <div class="feature">
+      <h2>🌐 Offline Support</h2>
+      <p>Convert files without an internet connection — privacy first.</p>
+    </div>
+    <div class="feature">
+      <h2>📄 Batch Conversion</h2>
+      <p>Upload multiple Word files and get PDFs all at once.</p>
     </div>
   </section>
 
@@ -82,10 +90,30 @@
     <a href="index.html" class="cta-button">Convert Now</a>
   </section>
 
+  <!-- Back to Top Button -->
+  <button id="back-to-top">↑ Top</button>
+
   <!-- Footer -->
   <footer>
     <p>&copy; 2025 WordPDF. All rights reserved.</p>
   </footer>
+
+  <!-- JS for scroll effects & back-to-top -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    const backToTop = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 50) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+
+      backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
+    });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
 
 </body>
 </html>
