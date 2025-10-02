@@ -1,93 +1,54 @@
-const fileInput = document.getElementById("wordFile");
-const convertBtn = document.getElementById("convertBtn");
-const spinner = document.getElementById("spinner");
-const resultDiv = document.getElementById("result");
-
-// Drag & drop support
-document.body.addEventListener("dragover", e => { 
-  e.preventDefault(); 
-  document.body.style.background = "#f0f8ff"; 
-});
-document.body.addEventListener("dragleave", () => { 
-  document.body.style.background = ""; 
-});
-document.body.addEventListener("drop", e => { 
-  e.preventDefault(); 
-  document.body.style.background = ""; 
-  if (e.dataTransfer.files.length > 0) fileInput.files = e.dataTransfer.files; 
+// Smooth scroll for navbar links
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if(target) {
+      window.scrollTo({
+        top: target.offsetTop - 70,
+        behavior: 'smooth'
+      });
+    }
+  });
 });
 
-convertBtn.addEventListener("click", async () => {
-  const file = fileInput.files[0];
-  resultDiv.innerHTML = "";
+// Hero floating shapes animation
+const hero = document.querySelector('.hero');
+const createShape = () => {
+  const shape = document.createElement('div');
+  shape.classList.add('floating-shape');
+  shape.style.left = Math.random() * 100 + '%';
+  shape.style.width = shape.style.height = Math.random() * 60 + 20 + 'px';
+  shape.style.animationDuration = Math.random() * 5 + 3 + 's';
+  hero.appendChild(shape);
+  setTimeout(() => hero.removeChild(shape), 8000);
+};
+setInterval(createShape, 1000);
 
-  if (!file) {
-    resultDiv.innerHTML = `<p style="color:red;font-weight:600;">⚠️ Please select or drop a Word file first.</p>`;
-    return;
-  }
+// Testimonials pop-up animation on scroll
+const testimonials = document.querySelectorAll('.testimonial');
+const showTestimonials = () => {
+  const triggerBottom = window.innerHeight / 1.2;
+  testimonials.forEach(testimonial => {
+    const top = testimonial.getBoundingClientRect().top;
+    if(top < triggerBottom) {
+      testimonial.style.opacity = 1;
+      testimonial.style.transform = 'translateY(0)';
+    }
+  });
+};
+window.addEventListener('scroll', showTestimonials);
+showTestimonials();
 
-  spinner.style.display = "block";
-  const startTime = Date.now();
-
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    const text = result.value;
-
-    const { PDFDocument, rgb } = PDFLib;
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    const { width, height } = page.getSize();
-    const fontSize = 12;
-
-    page.drawText(text, {
-      x: 50,
-      y: height - 50,
-      size: fontSize,
-      color: rgb(0, 0, 0),
-      maxWidth: width - 100
-    });
-
-    const pdfBytes = await pdfDoc.save();
-    const elapsed = Date.now() - startTime;
-    if (elapsed < 5000) await new Promise(r => setTimeout(r, 5000 - elapsed));
-
-    const originalName = file.name.replace(/\.[^/.]+$/, "");
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${originalName}.pdf`;
-    link.textContent = "⬇️ Download PDF";
-    link.style.cssText = `
-      display:inline-block;
-      padding:14px 24px;
-      background:#007BFF;
-      color:#fff;
-      border-radius:10px;
-      text-decoration:none;
-      font-weight:600;
-    `;
-    resultDiv.innerHTML = "";
-    resultDiv.appendChild(link);
-
-  } catch (err) {
-    console.error(err);
-    resultDiv.innerHTML = `
-      <p style="color:red;font-weight:600;">❌ Error converting file. Reload and try again.</p>
-      <button onclick="location.reload()" style="
-        padding:12px 20px;
-        margin-top:10px;
-        font-size:16px;
-        border:none;
-        border-radius:8px;
-        background:#e74c3c;
-        color:#fff;
-        cursor:pointer;
-      ">🔄 Reload Page</button>
-    `;
-  } finally {
-    spinner.style.display = "none";
-  }
+// Features hover effect (optional extra animation)
+const features = document.querySelectorAll('.feature');
+features.forEach(feature => {
+  feature.addEventListener('mouseenter', () => {
+    feature.style.transform = 'translateY(-10px) scale(1.05)';
+    feature.style.boxShadow = '0 25px 50px rgba(0,0,0,0.2)';
+  });
+  feature.addEventListener('mouseleave', () => {
+    feature.style.transform = 'translateY(0) scale(1)';
+    feature.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
+  });
 });

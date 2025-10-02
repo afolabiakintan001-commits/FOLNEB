@@ -1,37 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WordPDF - Converter</title>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
-
-<!-- PDF & DOCX libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOLNEB - Home</title>
+  <link rel="stylesheet" href="home.css">
+  <link rel="icon" href="logoh.png" type="image/png">
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="logo"><a href="home.html">WordPDF</a></div>
-  <div class="nav-links">
-    <a href="home.html">Home</a>
-    <a href="index.html">Converter</a>
-    <a href="home.html#features">Features</a>
-  </div>
-</nav>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index.html"><img src="logoh.png" alt="FOLNEB Logo"></a>
+    </div>
+    <div class="nav-links">
+      <a href="#hero">Home</a>
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="converter.html">Converter</a>
+    </div>
+  </nav>
 
-<!-- Converter Section -->
-<div class="container">
-  <h1>Word → PDF Converter</h1>
-  <input type="file" id="wordFile" accept=".docx">
-  <button id="convertBtn">Convert to PDF</button>
-  <div id="spinner"></div>
-  <div id="result"></div>
-</div>
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <h1>Convert Documents Effortlessly</h1>
+    <p>Transform Word files to PDF instantly. Fast, smooth, and free.</p>
+    <a href="converter.html" class="cta-button">Try the Converter</a>
+  </section>
 
-<script src="script.js"></script>
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="feature">
+      <h2>Fast Conversion</h2>
+      <p>Get your documents converted in seconds without losing formatting.</p>
+    </div>
+    <div class="feature">
+      <h2>Secure</h2>
+      <p>Your files stay private. We don’t store or share them with anyone.</p>
+    </div>
+    <div class="feature">
+      <h2>Cross-Platform</h2>
+      <p>Works on any device: Windows, Mac, mobile, or tablet.</p>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <h2>About FOLNEB</h2>
+    <p>FOLNEB provides simple and reliable online tools to make document management easy. We focus on speed, security, and accessibility.</p>
+    <p>Our converter tool allows anyone to convert Word files to PDF in seconds with a user-friendly interface.</p>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="testimonials">
+    <h2>What Our Users Say</h2>
+    <div class="testimonial">"FOLNEB made my document workflow so easy. Highly recommend!"</div>
+    <div class="testimonial">"Fast, secure, and very intuitive. Perfect for my office tasks."</div>
+    <div class="testimonial">"I love how simple the interface is. Conversions are instant!"</div>
+  </section>
+
+  <!-- Converter Preview -->
+  <section class="converter">
+    <div class="container">
+      <h1>Word to PDF Converter</h1>
+      <input type="file" id="wordFile" accept=".doc,.docx">
+      <button id="convertBtn">Convert</button>
+      <div id="spinner"></div>
+      <div id="result"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 FOLNEB. All rights reserved.
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="converter.js"></script>
+
 </body>
 </html>

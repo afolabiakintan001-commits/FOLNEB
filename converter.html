@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word to PDF Converter</title>
+  <link rel="stylesheet" href="converter.css">
+  <link rel="icon" href="logoh.png">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="logoh.png" alt="Logo">
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="converter.html">Converter</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Converter Section -->
+  <section class="converter">
+    <div class="container">
+      <h1>Word to PDF Converter</h1>
+      <input type="file" id="wordFile" accept=".doc,.docx">
+      <button id="convertBtn">Convert to PDF</button>
+      <div id="spinner"></div>
+      <div id="result"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Your Company. All rights reserved.
+  </footer>
+
+  <script src="converter.js"></script>
+</body>
+</html>

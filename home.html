@@ -1,121 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WordPDF - Home</title>
-<style>
-/* Reset & Base */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#f9fafc;color:#333;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
-a{text-decoration:none;color:inherit;}
-
-/* Navbar */
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 40px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,0.08);position:sticky;top:0;z-index:1000;transition:background 0.3s;}
-.navbar.scrolled{background:#4a63e7;color:#fff;}
-.navbar .logo{display:flex;align-items:center;font-weight:700;font-size:1.5rem;color:#4a63e7;}
-.navbar.scrolled .logo{color:#fff;}
-.navbar .nav-links a{margin-left:28px;font-weight:500;transition:color 0.3s;}
-.navbar .nav-links a:hover{color:#ff7e5f;}
-
-/* Hero */
-.hero{background:linear-gradient(135deg,#4a63e7,#764ba2);color:#fff;padding:120px 20px 90px;text-align:center;position:relative;}
-.hero h1{font-size:3rem;margin-bottom:20px;}
-.hero p{font-size:1.2rem;margin-bottom:35px;opacity:0.9;}
-.cta-button{padding:16px 36px;font-weight:600;background:#ff7e5f;color:#fff;border-radius:14px;display:inline-block;transition:0.3s;}
-.cta-button:hover{background:#eb6750;transform:scale(1.07);}
-
-/* Sections */
-.features,.about,.testimonials,.final-cta{max-width:1200px;margin:50px auto;padding:0 20px;text-align:center;}
-.features{display:flex;flex-wrap:wrap;justify-content:center;gap:30px;}
-.feature{background:#fff;border-radius:20px;padding:40px 30px;box-shadow:0 12px 30px rgba(0,0,0,0.08);flex:1 1 280px;transition:0.3s;}
-.feature:hover{transform:translateY(-7px);box-shadow:0 16px 40px rgba(0,0,0,0.12);}
-.feature h2{font-size:1.5rem;color:#4a63e7;margin-bottom:15px;}
-.feature p{color:#666;line-height:1.6;}
-.about h2,.testimonials h2,.final-cta h2{font-size:2rem;margin-bottom:20px;}
-.about p,.final-cta p,.testimonials p{font-size:1.1rem;opacity:0.9;margin-bottom:15px;}
-.testimonials .testimonial{margin:20px 0;font-style:italic;}
-
-/* Back to top */
-#back-to-top{position:fixed;bottom:30px;right:30px;padding:10px 15px;font-size:18px;border:none;border-radius:50%;background:#4a63e7;color:#fff;cursor:pointer;display:none;}
-
-/* Footer */
-footer{text-align:center;padding:20px;background:#333;color:#fff;font-size:0.95rem;margin-top:auto;}
-
-/* Responsive */
-@media(max-width:768px){
-  .hero h1{font-size:2.3rem;}
-  .features{flex-direction:column;gap:25px;}
-  .navbar{flex-direction:column;align-items:flex-start;}
-  .navbar .nav-links{margin-top:12px;}
-  .navbar .nav-links a{margin-left:0;margin-right:20px;}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOLNEB - Home</title>
+  <link rel="stylesheet" href="home.css">
+  <link rel="icon" type="image/png" href="logoh.png">
 </head>
 <body>
 
-<nav class="navbar" id="navbar">
-  <div class="logo">WordPDF</div>
-  <div class="nav-links">
-    <a href="#">Home</a>
-    <a href="index.html">Converter</a>
-    <a href="#features">Features</a>
-    <a href="#about">About</a>
-    <a href="#testimonials">Testimonials</a>
-  </div>
-</nav>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="logoh.png" alt="FOLNEB Logo">
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#converter">Converter</a>
+    </div>
+  </nav>
 
-<section class="hero">
-  <h1>Convert Word to PDF Instantly</h1>
-  <p>Fast, free, and secure Word to PDF converter right in your browser.</p>
-  <a href="index.html" class="cta-button">Start Converting</a>
-</section>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Welcome to FOLNEB</h1>
+    <p>Your ultimate Word to PDF solution with style and speed.</p>
+    <a href="#converter" class="cta-button">Convert Now</a>
+  </section>
 
-<section id="features" class="features">
-  <div class="feature"><h2>⚡ Fast Conversion</h2><p>Upload your Word file and get a PDF in seconds — no waiting around.</p></div>
-  <div class="feature"><h2>🔒 Secure</h2><p>Your files are processed in-browser. Nothing gets uploaded to a server.</p></div>
-  <div class="feature"><h2>💻 Easy to Use</h2><p>Just click, upload, and convert. No sign-up or extra software needed.</p></div>
-  <div class="feature"><h2>🌐 Offline Support</h2><p>Convert files without an internet connection — privacy first.</p></div>
-  <div class="feature"><h2>📄 Batch Conversion</h2><p>Upload multiple Word files and get PDFs all at once.</p></div>
-</section>
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="feature">
+      <h2>Fast Conversion</h2>
+      <p>Instantly convert your Word files to PDF without waiting.</p>
+    </div>
+    <div class="feature">
+      <h2>Secure</h2>
+      <p>Your files are private and safe. We don’t store them.</p>
+    </div>
+    <div class="feature">
+      <h2>Easy to Use</h2>
+      <p>Drag and drop your files and convert in just one click.</p>
+    </div>
+  </section>
 
-<section id="about" class="about">
-  <h2>About WordPDF</h2>
-  <p>WordPDF was built to make file conversion simple and private. Unlike online services, your documents never leave your device.</p>
-</section>
+  <!-- About -->
+  <section id="about" class="about">
+    <h2>About FOLNEB</h2>
+    <p>We provide a seamless, fast, and secure way to convert Word documents into PDF files for personal and professional use.</p>
+    <p>Our platform is optimized to give you the best experience with minimal steps.</p>
+  </section>
 
-<section id="testimonials" class="testimonials">
-  <h2>What Our Users Say</h2>
-  <div class="testimonial"><p>“Super quick and I love that my files never get uploaded. Perfect for work!”</p><span>- Sarah J.</span></div>
-  <div class="testimonial"><p>“No ads, no nonsense. Just a fast converter that works.”</p><span>- David M.</span></div>
-  <div class="testimonial"><p>“I use WordPDF daily for reports. It’s lightweight and secure.”</p><span>- Emily R.</span></div>
-</section>
+  <!-- Testimonials -->
+  <section id="testimonials" class="testimonials">
+    <h2>What People Say</h2>
+    <div class="testimonial">"FOLNEB saved me so much time! Quick and reliable." - Jane D.</div>
+    <div class="testimonial">"I love the clean interface and smooth conversion process." - Mark R.</div>
+    <div class="testimonial">"The best Word to PDF converter I’ve ever used!" - Lisa M.</div>
+    <div class="testimonial">"Super easy and fast! Highly recommend." - Alex P.</div>
+  </section>
 
-<section class="final-cta">
-  <h2>Ready to Convert?</h2>
-  <p>Turn your Word files into PDFs in seconds — free and secure.</p>
-  <a href="index.html" class="cta-button">Convert Now</a>
-</section>
+  <!-- Converter Section -->
+  <section id="converter" class="converter">
+    <div class="container">
+      <h1>Word to PDF Converter</h1>
+      <input type="file" id="wordFile" accept=".doc,.docx">
+      <button id="convertBtn">Convert</button>
+      <div id="spinner"></div>
+      <div id="result"></div>
+    </div>
+  </section>
 
-<button id="back-to-top">↑</button>
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 FOLNEB. All rights reserved.
+  </footer>
 
-<footer>&copy; 2025 WordPDF. All rights reserved.</footer>
-
-<script>
-const navbar = document.getElementById('navbar');
-const backToTop = document.getElementById('back-to-top');
-
-window.addEventListener('scroll', () => {
-  if(window.scrollY > 50) navbar.classList.add('scrolled');
-  else navbar.classList.remove('scrolled');
-
-  backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
-});
-
-backToTop.addEventListener('click', () => {
-  window.scrollTo({ top:0, behavior:'smooth' });
-});
-</script>
-
+  <script src="home.js"></script>
 </body>
 </html>
