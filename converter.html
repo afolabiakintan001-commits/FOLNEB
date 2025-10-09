@@ -137,22 +137,30 @@
       document.getElementById('workspaceYear').textContent = new Date().getFullYear();
     </script>
 
-    <!-- VENDOR LIBS (CDN, guaranteed load) -->
+    <!-- ===== VENDOR LIBS (CDN) ===== -->
+    <!-- PDF.js + worker -->
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script>
-      // PDF.js worker
       if (window.pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
       }
     </script>
+
+    <!-- html2canvas (REQUIRED for jsPDF doc.html) -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <!-- PDF creation + utilities -->
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <!-- Converters -->
     <script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
 
-    <!-- APP SCRIPTS (must load AFTER vendors) -->
+    <!-- ===== APP SCRIPTS (after vendors) ===== -->
     <script src="main.js"></script>
     <script src="converter.js"></script>
   </body>

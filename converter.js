@@ -1,47 +1,34 @@
 // FOLNEB Converter: real client-side conversions + UI wiring
-// Requires vendor libs loaded in converter.html: pdf-lib, jsPDF, Mammoth, XLSX, JSZip, PDF.js, Tesseract
+// Requires vendor libs loaded in converter.html: pdf-lib, jsPDF, Mammoth, XLSX, JSZip, PDF.js, Tesseract, html2canvas
 
 (function () {
+  'use strict';
+
   const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-  const convertBtn = '#convertBtn';
-  const sourceFile = '#sourceFile';
-  const spinnerSel = '#spinner';
-  const resultSel = '#result';
-  const fileNameSel = '#fileName';
-  const formSel = '#converterForm';
-  const typeSel = '#conversionType';
-  const fileLabelTextSel = '#fileLabelText';
-  const fileHintSel = '#fileHint';
-  const summarySel = '#conversionSummary';
-  const advListSel = '#advancedOptions';
-  const advNoteSel = '#advancedNote';
+  const convertBtnEl = $('#convertBtn');
+  const sourceFileInput = $('#sourceFile');
+  const spinner = $('#spinner');
+  const result = $('#result');
+  const fileNameEl = $('#fileName');
+  const converterForm = $('#converterForm');
+  const conversionTypeSelect = $('#conversionType');
+  const fileLabelText = $('#fileLabelText');
+  const fileHint = $('#fileHint');
+  const conversionSummary = $('#conversionSummary');
+  const advancedOptionsList = $('#advancedOptions');
+  const advancedNote = $('#advancedNote');
 
-  const convertBtnEl = $(convertBtn);
-  const sourceFileInput = $(sourceFile);
-  const spinner = $(spinnerSel);
-  const result = $(resultSel);
-  const fileNameEl = $(fileNameSel);
-  const converterForm = $(formSel);
-  const conversionTypeSelect = $(typeSel);
-  const fileLabelText = $(fileLabelTextSel);
-  const fileHint = $(fileHintSel);
-  const conversionSummary = $(summarySel);
-  const advancedOptionsList = $(advListSel);
-  const advancedNote = $(advNoteSel);
+  if (!convertBtnEl || !sourceFileInput || !spinner || !result || !converterForm || !conversionTypeSelect) return;
 
-  if (!convertBtnEl || !sourceFileInput || !spinner || !result || !converterForm || !conversionTypeSelect) {
-    return;
-  }
-
-  // Helpers
-  const readFileAsArrayBuffer = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('We couldn’t read this file.'));
-    reader.readAsArrayBuffer(file);
-  });
+  // ===== Helpers
+  const readFileAsArrayBuffer = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('We couldn’t read this file.'));
+      reader.readAsArrayBuffer(file);
+    });
 
   const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
@@ -49,9 +36,10 @@
     a.href = url;
     a.download = filename;
     a.className = 'download-link';
-    a.textContent = `Download ${filename}`;
+    a.textContent = `⬇ Download ${filename}`;
     result.appendChild(a);
     a.focus();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   const blobFromPdfLibDoc = async (pdfDoc) => {
@@ -62,20 +50,32 @@
   const renderHtmlToPdf = async (htmlString) => {
     const { jsPDF } = window.jspdf || {};
     if (!jsPDF) throw new Error('jsPDF not loaded');
+    if (!window.html2canvas) throw new Error('html2canvas not loaded');
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+    // Render off-DOM
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '794px'; // A4 width @ 72dpi
     container.innerHTML = htmlString;
     document.body.appendChild(container);
+
     await new Promise((resolve) => {
       doc.html(container, {
         callback: () => resolve(),
-        margin: [20, 20, 20, 20],
+        margin: [36, 36, 36, 36],
         autoPaging: 'text',
-        html2canvas: { scale: 0.9 },
+        html2canvas: {
+          scale: 0.9,
+          useCORS: true,
+          logging: false,
+          windowWidth: 794,
+        },
       });
     });
+
     document.body.removeChild(container);
     const arrayBuffer = doc.output('arraybuffer');
     return new Blob([arrayBuffer], { type: 'application/pdf' });
@@ -97,22 +97,20 @@
 
   const setFileName = (files) => {
     if (!fileNameEl) return;
-    if (!files || files.length === 0) {
-      fileNameEl.textContent = 'No file selected yet.';
-    } else if (files.length === 1) {
-      fileNameEl.textContent = `Selected: ${files[0].name}`;
-    } else {
-      fileNameEl.textContent = `Selected ${files.length} files.`;
-    }
+    if (!files || files.length === 0) fileNameEl.textContent = 'No file selected yet.';
+    else if (files.length === 1) fileNameEl.textContent = `Selected: ${files[0].name}`;
+    else fileNameEl.textContent = `Selected ${files.length} files.`;
   };
 
   const createDownloadName = (originalName, extension) => {
-    const base = originalName && originalName.includes('.') ? originalName.replace(/\.[^/.]+$/, '') : (originalName || 'converted');
+    const base = originalName && originalName.includes('.')
+      ? originalName.replace(/\.[^/.]+$/, '')
+      : (originalName || 'converted');
     return `${base}${extension}`;
   };
 
   const parseRanges = (input) => {
-    const parts = String(input || '').split(',').map(s => s.trim()).filter(Boolean);
+    const parts = String(input || '').split(',').map((s) => s.trim()).filter(Boolean);
     const ranges = [];
     for (const p of parts) {
       const m = p.match(/^(\d+)(?:-(\d+))?$/);
@@ -125,9 +123,19 @@
     return ranges;
   };
 
-  // Conversion handlers
+  function escapeXml(unsafe) {
+    return String(unsafe || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
+  // ===== Conversion handlers
   const handlers = {
     'word-to-pdf': async (files) => {
+      if (!window.mammoth) throw new Error('Mammoth not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const res = await window.mammoth.convertToHtml({ arrayBuffer: ab });
@@ -135,7 +143,10 @@
       const blob = await renderHtmlToPdf(html);
       return { blob, suggestedName: createDownloadName(file.name, '.pdf') };
     },
+
     'pdf-to-word': async (files) => {
+      if (!window.pdfjsLib) throw new Error('PDF.js not loaded');
+      if (!window.JSZip) throw new Error('JSZip not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const loadingTask = window.pdfjsLib.getDocument({ data: new Uint8Array(ab) });
@@ -144,19 +155,28 @@
       for (let p = 1; p <= pdf.numPages; p++) {
         const page = await pdf.getPage(p);
         const content = await page.getTextContent();
-        const strings = content.items.map(it => it.str).join(' ');
+        const strings = content.items.map((it) => it.str).join(' ');
         texts.push(strings);
       }
       const zip = new window.JSZip();
-      zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`);
-      zip.folder('_rels').file('.rels', `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
-      const bodyXml = texts.map(t => `<w:p><w:r><w:t>${escapeXml(t)}</w:t></w:r></w:p>`).join('');
+      zip.file(
+        '[Content_Types].xml',
+        `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`
+      );
+      zip.folder('_rels').file(
+        '.rels',
+        `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`
+      );
+      const bodyXml = texts.map((t) => `<w:p><w:r><w:t>${escapeXml(t)}</w:t></w:r></w:p>`).join('');
       const docXml = `<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${bodyXml}</w:body></w:document>`;
       zip.folder('word').file('document.xml', docXml);
       const blob = await zip.generateAsync({ type: 'blob' });
       return { blob, suggestedName: createDownloadName(file.name, '.docx'), note: 'Text-only DOCX (layout simplified)' };
     },
+
     'ppt-to-pdf': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
+      if (!window.JSZip) throw new Error('JSZip not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const zip = await window.JSZip.loadAsync(ab);
@@ -179,7 +199,9 @@
       const blob = await blobFromPdfLibDoc(pdfDoc);
       return { blob, suggestedName: createDownloadName(file.name, '.pdf') };
     },
+
     'xls-to-pdf': async (files) => {
+      if (!window.XLSX) throw new Error('SheetJS not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const wb = window.XLSX.read(new Uint8Array(ab), { type: 'array' });
@@ -188,7 +210,9 @@
       const blob = await renderHtmlToPdf(html);
       return { blob, suggestedName: createDownloadName(file.name, '.pdf') };
     },
+
     'image-to-pdf': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
       const pdfDoc = await PDFLib.PDFDocument.create();
       for (const f of files) {
         const buf = new Uint8Array(await readFileAsArrayBuffer(f));
@@ -202,18 +226,23 @@
       const name = files[0] ? files[0].name.replace(/\.[^/.]+$/, '') + '.pdf' : 'images.pdf';
       return { blob, suggestedName: name };
     },
+
     'pdf-merge': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
       const out = await PDFLib.PDFDocument.create();
       for (const f of files) {
         const ab = await readFileAsArrayBuffer(f);
         const src = await PDFLib.PDFDocument.load(ab);
         const pages = await out.copyPages(src, src.getPageIndices());
-        pages.forEach(p => out.addPage(p));
+        pages.forEach((p) => out.addPage(p));
       }
       const blob = await blobFromPdfLibDoc(out);
       return { blob, suggestedName: 'merged.pdf' };
     },
+
     'pdf-split': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
+      if (!window.JSZip) throw new Error('JSZip not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const src = await PDFLib.PDFDocument.load(ab);
@@ -226,8 +255,11 @@
       for (const [s, e] of ranges) {
         const from = Math.max(1, s), to = Math.min(e, total);
         const sub = await PDFLib.PDFDocument.create();
-        const pages = await sub.copyPages(src, Array.from({ length: (to - from + 1) }, (_, i) => (from - 1) + i));
-        pages.forEach(p => sub.addPage(p));
+        const pages = await sub.copyPages(
+          src,
+          Array.from({ length: (to - from + 1) }, (_, i) => (from - 1) + i)
+        );
+        pages.forEach((p) => sub.addPage(p));
         const bytes = await sub.save();
         zip.file(`split_${idx}.pdf`, bytes);
         idx++;
@@ -235,7 +267,10 @@
       const blob = await zip.generateAsync({ type: 'blob' });
       return { blob, suggestedName: createDownloadName(file.name, '_split.zip') };
     },
+
     'pdf-compress': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
+      if (!window.pdfjsLib) throw new Error('PDF.js not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const loadingTask = window.pdfjsLib.getDocument({ data: new Uint8Array(ab) });
@@ -251,7 +286,7 @@
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: page.getViewport({ scale }) }).promise;
         const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        const jpgBytes = Uint8Array.from(atob(dataUrl.split(',')[1]), c => c.charCodeAt(0));
+        const jpgBytes = Uint8Array.from(atob(dataUrl.split(',')[1]), (c) => c.charCodeAt(0));
         const img = await out.embedJpg(jpgBytes);
         const pageOut = out.addPage([img.width, img.height]);
         pageOut.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
@@ -259,7 +294,9 @@
       const blob = await blobFromPdfLibDoc(out);
       return { blob, suggestedName: createDownloadName(file.name, '_compressed.pdf') };
     },
+
     'pdf-sign': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const doc = await PDFLib.PDFDocument.load(ab);
@@ -278,13 +315,18 @@
       const blob = await blobFromPdfLibDoc(doc);
       return { blob, suggestedName: createDownloadName(file.name, '_esign.pdf') };
     },
+
     'pdf-ocr': async (files) => {
+      if (!window.PDFLib) throw new Error('pdf-lib not loaded');
+      if (!window.pdfjsLib) throw new Error('PDF.js not loaded');
+      if (!window.Tesseract) throw new Error('Tesseract not loaded');
       const file = files[0];
       const ab = await readFileAsArrayBuffer(file);
       const loadingTask = window.pdfjsLib.getDocument({ data: new Uint8Array(ab) });
       const pdf = await loadingTask.promise;
       const out = await PDFLib.PDFDocument.create();
-      for (let p = 1; p <= pdf.numPages; p++) {
+      const MAX_PAGES = Math.min(pdf.numPages, 12); // safety cap
+      for (let p = 1; p <= MAX_PAGES; p++) {
         const page = await pdf.getPage(p);
         const viewport = page.getViewport({ scale: 2.0 });
         const canvas = document.createElement('canvas');
@@ -292,8 +334,9 @@
         canvas.height = Math.floor(viewport.height);
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport }).promise;
+
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        const imgBytes = Uint8Array.from(atob(dataUrl.split(',')[1]), c => c.charCodeAt(0));
+        const imgBytes = Uint8Array.from(atob(dataUrl.split(',')[1]), (c) => c.charCodeAt(0));
         const img = await out.embedJpg(imgBytes);
         const pageOut = out.addPage([img.width, img.height]);
         pageOut.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
@@ -301,13 +344,14 @@
         const { data } = await Tesseract.recognize(canvas, 'eng');
         const words = data.words || [];
         const font = await out.embedFont(PDFLib.StandardFonts.Helvetica);
-        words.forEach(w => {
+        words.forEach((w) => {
           const x = w.bbox.x0;
-          const yCanvas = w.bbox.y0;
           const h = w.bbox.y1 - w.bbox.y0;
-          const y = img.height - yCanvas - h;
+          const y = img.height - w.bbox.y0 - h; // flip Y
           const text = w.text || '';
-          pageOut.drawText(text, { x, y, size: 10, font, color: PDFLib.rgb(0,0,0), opacity: 0 });
+          if (text) {
+            pageOut.drawText(text, { x, y, size: 10, font, color: PDFLib.rgb(0, 0, 0), opacity: 0 });
+          }
         });
       }
       const blob = await blobFromPdfLibDoc(out);
@@ -315,15 +359,7 @@
     },
   };
 
-  function escapeXml(unsafe) {
-    return String(unsafe || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
-      .replace(/'/g, '&apos;');
-  }
-
+  // ===== Config per tool
   const conversionOptions = {
     'word-to-pdf': {
       accept: '.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -472,7 +508,8 @@
     sourceFileInput.accept = cfg.accept;
     sourceFileInput.value = '';
     sourceFileInput.multiple = Boolean(cfg.multiple);
-    if (cfg.multiple) sourceFileInput.setAttribute('multiple', ''); else sourceFileInput.removeAttribute('multiple');
+    if (cfg.multiple) sourceFileInput.setAttribute('multiple', '');
+    else sourceFileInput.removeAttribute('multiple');
     convertBtnEl.textContent = cfg.buttonIdle;
 
     result.innerHTML = '';
@@ -485,14 +522,15 @@
   const bytes100MB = 100 * 1024 * 1024;
   const matchesAccept = (file, accept) => {
     if (!accept) return true;
-    const parts = accept.split(',').map(s => s.trim()).filter(Boolean);
+    const parts = accept.split(',').map((s) => s.trim()).filter(Boolean);
     const ext = (file.name.split('.').pop() || '').toLowerCase();
-    return parts.some(p => {
+    return parts.some((p) => {
       if (p.startsWith('.')) return p.slice(1).toLowerCase() === ext;
       return file.type === p;
     });
   };
 
+  // ===== Events
   converterForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const type = conversionTypeSelect.value;
@@ -509,8 +547,14 @@
       return;
     }
     for (const f of files) {
-      if (f.size > bytes100MB) { result.appendChild(createError('File exceeds 100MB limit.')); return; }
-      if (!matchesAccept(f, cfg.accept)) { result.appendChild(createError(`This tool accepts: ${cfg.accept}`)); return; }
+      if (f.size > bytes100MB) {
+        result.appendChild(createError('File exceeds 100MB limit.'));
+        return;
+      }
+      if (!matchesAccept(f, cfg.accept)) {
+        result.appendChild(createError(`This tool accepts: ${cfg.accept}`));
+        return;
+      }
     }
 
     showBusy(true, cfg.buttonIdle, cfg.buttonBusy);
@@ -519,6 +563,8 @@
       const out = await cfg.handler(files, cfg);
       const { blob, suggestedName } = out;
       const name = suggestedName || createDownloadName(files[0]?.name, cfg.outputExtension || '.pdf');
+
+      // optional storage + history hooks
       try {
         if (window.uploadToStorage) {
           await window.uploadToStorage(`inputs/${name}`, files[0]);
@@ -546,7 +592,6 @@
           if (window.listRecentJobs) window.listRecentJobs();
         }
       } catch {}
-
     } catch (err) {
       const message = err && err.message ? err.message : 'Something went wrong.';
       result.appendChild(createError(message));
@@ -556,12 +601,13 @@
   });
 
   conversionTypeSelect.addEventListener('change', (e) => applyConversionConfig(e.target.value));
+
   sourceFileInput.addEventListener('change', () => {
     const files = sourceFileInput.files;
     setFileName(files);
     try {
       const recent = JSON.parse(localStorage.getItem('folneb:recent') || '[]');
-      const names = Array.from(files || []).map(f => f.name);
+      const names = Array.from(files || []).map((f) => f.name);
       const updated = [...names, ...recent].slice(0, 10);
       localStorage.setItem('folneb:recent', JSON.stringify(updated));
     } catch {}
@@ -570,4 +616,3 @@
   const initialType = (localStorage.getItem('folneb:type') || new URLSearchParams(location.search).get('type') || 'word-to-pdf').toLowerCase();
   applyConversionConfig(conversionOptions[initialType] ? initialType : 'word-to-pdf');
 })();
-
