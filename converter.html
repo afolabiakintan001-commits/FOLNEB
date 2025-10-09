@@ -9,19 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="main.css" />
   </head>
-  <!-- Vendor libs (CDN, quick fix) -->
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";</script>
-<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
 
-<!-- Your app scripts -->
-<script src="main.js"></script>
-<script src="converter.js"></script>
   <body class="page page--workspace">
     <header class="site-header">
       <div class="container header-content">
@@ -145,19 +133,27 @@
       </div>
     </footer>
 
-    <script>document.getElementById('workspaceYear').textContent = new Date().getFullYear();</script>
-    <!-- Vendor libs -->
-    <script src="src/js/lib/pdf-lib.min.js"></script>
-    <script src="src/js/lib/jspdf.umd.min.js"></script>
-    <script src="src/js/lib/mammoth.min.js"></script>
-    <script src="src/js/lib/xlsx.full.min.js"></script>
-    <script src="src/js/lib/jszip.min.js"></script>
-    <script src="src/js/lib/pdf.min.js"></script>
-    <script>window.pdfjsLib&&(window.pdfjsLib.GlobalWorkerOptions.workerSrc='src/js/lib/pdf.worker.min.js');</script>
-    <script src="src/js/lib/tesseract.min.js"></script>
-    <!-- App -->
+    <script>
+      document.getElementById('workspaceYear').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- VENDOR LIBS (CDN, guaranteed load) -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script>
+      // PDF.js worker
+      if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+
+    <!-- APP SCRIPTS (must load AFTER vendors) -->
     <script src="main.js"></script>
-    <script src="converter.js" defer></script>
+    <script src="converter.js"></script>
   </body>
 </html>
-
