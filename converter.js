@@ -44,13 +44,47 @@
 
   // Handlers
   const handlers = {};
-  handlers['word-to-pdf'] = async (files) => {
-    if (!window.mammoth) throw new Error('Mammoth not loaded'); const f = files[0]; if (!/\.docx$/i.test(f.name)) throw new Error('Use a .docx file');
-    const ab = await readFileAsArrayBuffer(f);
-    const res = await window.mammoth.convertToHtml({ arrayBuffer: ab }, { includeDefaultStyleMap: true, convertImage: mammoth.images.inline((elem)=> elem.read('base64').then((data)=>({ src: `data:${elem.contentType};base64,${data}` }))) });
-    const el = document.createElement('div'); el.innerHTML = res.value; if (!el.textContent.trim() && el.querySelectorAll('img').length===0) throw new Error('No readable content found in DOCX.');
-    const blob = await renderHtmlToPdf(el); return { blob, suggestedName: createName(f.name, '.pdf') };
-  };
+  handlers["word-to-pdf"] = async (files) => {
+  const f = files[0];
+  if (!/\.docx$/i.test(f.name)) throw new Error('Use a .docx file');
+
+  const api = (typeof window !== 'undefined' && window.FOLNEB_API) ? String(window.FOLNEB_API) : '';
+  const serverStart = performance.now();
+  if (api) {
+    try {
+      console.log('[FOLNEB] word->pdf server attempt', { api });
+      const resp = await fetch(api, {
+        method: 'POST',
+        headers: { 'X-Filename': f.name },
+        body: f,
+      });
+      if (!resp.ok) throw new Error(`Server convert failed (${resp.status})`);
+      const ct = resp.headers.get('content-type') || '';
+      if (!ct.includes('pdf')) throw new Error('Server did not return a PDF');
+      const blob = await resp.blob();
+      console.log('[FOLNEB] word->pdf server OK', { ms: Math.round(performance.now() - serverStart), size: blob.size });
+      return { blob, suggestedName: f.name.replace(/\.[^/.]+$/, '') + '.pdf' };
+    } catch (e) {
+      console.warn('[FOLNEB] server path failed; falling back', e);
+    }
+  } else {
+    console.log('[FOLNEB] no server endpoint configured — using client fallback');
+  }
+
+  // Client fallback (Mammoth -> html2canvas + jsPDF)
+  if (!window.mammoth) throw new Error('Mammoth not loaded');
+  const ab = await readFileAsArrayBuffer(f);
+  const res = await window.mammoth.convertToHtml(
+    { arrayBuffer: ab },
+    { includeDefaultStyleMap: true, convertImage: mammoth.images.inline((elem)=> elem.read('base64').then((data)=>({ src: `data:${elem.contentType};base64,${data}` }))) }
+  );
+  const el = document.createElement('div'); el.innerHTML = res.value;
+  if (!el.textContent.trim() && el.querySelectorAll('img').length === 0) throw new Error('No readable content found in DOCX.');
+  const fbStart = performance.now();
+  const blob = await renderHtmlToPdf(el);
+  console.log('[FOLNEB] word->pdf fallback OK', { ms: Math.round(performance.now() - fbStart), size: blob.size });
+  return { blob, suggestedName: f.name.replace(/\.[^/.]+$/, '') + '.pdf' };
+};};
   handlers['pdf-to-word'] = async (files) => {
     if (!window.pdfjsLib) throw new Error('PDF.js not loaded'); if (!window.JSZip) throw new Error('JSZip not loaded'); const f=files[0]; const ab = await readFileAsArrayBuffer(f);
     const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(ab) }).promise; const texts=[]; for(let p=1;p<=pdf.numPages;p++){ const page=await pdf.getPage(p); const c=await page.getTextContent(); texts.push(c.items.map(i=>i.str).join(' ')); }
