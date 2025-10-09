@@ -793,7 +793,7 @@ img {
   font-size: 0.9rem;
 }
 
-#wordFile {
+#wordFile, #sourceFile {
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: var(--radius-sm);
@@ -802,7 +802,7 @@ img {
   color: var(--color-heading);
 }
 
-#wordFile.is-focused {
+#wordFile.is-focused, #sourceFile.is-focused {
   border-color: rgba(99, 102, 241, 0.75);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }

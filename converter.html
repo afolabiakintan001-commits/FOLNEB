@@ -3,19 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DocuShift | Document Automation Workspace</title>
+    <title>FOLNEB | Document Automation Workspace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="main.css" />
   </head>
+  <!-- Vendor libs (CDN, quick fix) -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";</script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+
+<!-- Your app scripts -->
+<script src="main.js"></script>
+<script src="converter.js"></script>
   <body class="page page--workspace">
     <header class="site-header">
       <div class="container header-content">
-        <a class="logo" href="index.html">DocuShift</a>
+        <a class="logo" href="index.html">FOLNEB</a>
         <nav class="site-nav" aria-label="Main navigation">
           <ul>
             <li><a href="index.html">Overview</a></li>
@@ -31,11 +41,9 @@
         <div class="container workspace__layout">
           <div class="workspace__primary">
             <header class="workspace__intro">
-              <h1 id="workspace-heading">Select a recipe to get started</h1>
+              <h1 id="workspace-heading">Select a conversion to get started</h1>
               <p class="lead">
-                The DocuShift workspace simulates production-ready conversions, PDF prep,
-                and optimization flows. Choose a recipe, upload a file, and tailor the
-                optional enhancements below.
+                The FOLNEB workspace runs real client-side conversions, PDF prep, and optimization flows. Choose a conversion, upload a file, and tailor the optional enhancements below.
               </p>
             </header>
 
@@ -54,27 +62,21 @@
                       <option value="pdf-to-word">PDF to Word</option>
                       <option value="pdf-to-ppt">PDF to PowerPoint</option>
                       <option value="pdf-merge">Merge PDFs</option>
+                      <option value="pdf-split">Split PDF</option>
                       <option value="pdf-compress">Compress PDF</option>
                       <option value="pdf-sign">Prep for e-sign</option>
                       <option value="pdf-ocr">OCR a scanned PDF</option>
                     </select>
                   </div>
-                  <p class="conversion-summary" id="conversionSummary">
-                    Word → PDF · Preserve your document formatting and fonts.
-                  </p>
+                  <p class="conversion-summary" id="conversionSummary">Word → PDF — Preserve your document formatting and fonts.</p>
                 </div>
 
                 <div class="file-input">
-                  <label class="file-label" for="wordFile">
+                  <label class="file-label" for="sourceFile">
                     <span class="file-label-text" id="fileLabelText">Select a Word document</span>
-                    <span class="file-hint" id="fileHint">Supported formats: .docx, .doc</span>
+                    <span class="file-hint" id="fileHint">Supported formats: .docx</span>
                   </label>
-                  <input
-                    type="file"
-                    id="wordFile"
-                    name="wordFile"
-                    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  />
+                  <input type="file" id="sourceFile" name="sourceFile" />
                   <p class="file-name" id="fileName">No file selected yet.</p>
                 </div>
 
@@ -84,9 +86,7 @@
                   <p id="advancedNote" class="advanced-options__note"></p>
                 </div>
 
-                <button type="submit" id="convertBtn" class="btn btn-primary">
-                  Convert to PDF
-                </button>
+                <button type="submit" id="convertBtn" class="btn btn-primary">Convert to PDF</button>
               </fieldset>
             </form>
 
@@ -101,10 +101,7 @@
           <aside class="workspace__aside" aria-label="Workspace resources">
             <section class="workspace-panel">
               <h2>Recipe guide</h2>
-              <p>
-                Deep links launch the workspace with the proper configuration. Use them to
-                demo or bookmark your most common flows.
-              </p>
+              <p>Deep links launch the workspace with the proper configuration. Use them to demo or bookmark your most common flows.</p>
               <div class="quick-links">
                 <a href="converter.html?type=word-to-pdf">Word → PDF</a>
                 <a href="converter.html?type=pdf-to-word">PDF → Word</a>
@@ -115,13 +112,8 @@
             </section>
 
             <section class="workspace-panel">
-              <h2>Backend integration tips</h2>
-              <ul class="panel-list">
-                <li>Send uploads to your API endpoint on form submit.</li>
-                <li>Return a signed download URL and update the link in <code>main.js</code>.</li>
-                <li>Mirror the simulated delay with real progress indicators.</li>
-                <li>Add audit metadata (user ID, case number) via hidden inputs.</li>
-              </ul>
+              <h2>Recent Conversions</h2>
+              <ul id="recentJobs" class="panel-list"></ul>
             </section>
 
             <section class="workspace-panel workspace-panel--muted">
@@ -129,15 +121,15 @@
               <dl class="status-grid">
                 <div>
                   <dt>Recipes enabled</dt>
-                  <dd>10</dd>
+                  <dd>11</dd>
                 </div>
                 <div>
-                  <dt>Average delay</dt>
-                  <dd>2.3s</dd>
+                  <dt>Client-only</dt>
+                  <dd>Yes</dd>
                 </div>
                 <div>
-                  <dt>Simulated success</dt>
-                  <dd>100%</dd>
+                  <dt>Worker support</dt>
+                  <dd>Tesseract / PDF.js</dd>
                 </div>
               </dl>
             </section>
@@ -148,14 +140,24 @@
 
     <footer class="site-footer">
       <div class="container footer-content">
-        <p>&copy; <span id="workspaceYear"></span> DocuShift. All rights reserved.</p>
+        <p>&copy; <span id="workspaceYear"></span> FOLNEB. All rights reserved.</p>
         <a href="home.html" class="footer-link">Explore the tour</a>
       </div>
     </footer>
 
-    <script>
-      document.getElementById("workspaceYear").textContent = new Date().getFullYear();
-    </script>
-    <script src="main.js" defer></script>
+    <script>document.getElementById('workspaceYear').textContent = new Date().getFullYear();</script>
+    <!-- Vendor libs -->
+    <script src="src/js/lib/pdf-lib.min.js"></script>
+    <script src="src/js/lib/jspdf.umd.min.js"></script>
+    <script src="src/js/lib/mammoth.min.js"></script>
+    <script src="src/js/lib/xlsx.full.min.js"></script>
+    <script src="src/js/lib/jszip.min.js"></script>
+    <script src="src/js/lib/pdf.min.js"></script>
+    <script>window.pdfjsLib&&(window.pdfjsLib.GlobalWorkerOptions.workerSrc='src/js/lib/pdf.worker.min.js');</script>
+    <script src="src/js/lib/tesseract.min.js"></script>
+    <!-- App -->
+    <script src="main.js"></script>
+    <script src="converter.js" defer></script>
   </body>
 </html>
+
