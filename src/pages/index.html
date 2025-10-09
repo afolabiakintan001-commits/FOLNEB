@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocuShift | Modern Document Automation Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body class="page page--overview">
+    <header class="site-header">
+      <div class="container header-content">
+        <a class="logo" href="index.html">DocuShift</a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="index.html" aria-current="page">Overview</a></li>
+            <li><a href="home.html">Product Tour</a></li>
+            <li><a href="converter.html">Workspace</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero hero--gradient">
+        <div class="container hero-content">
+          <div class="hero-copy">
+            <p class="eyebrow">Document infrastructure for every team</p>
+            <h1>Convert, optimize, and route files without leaving your browser.</h1>
+            <p class="lead">
+              DocuShift orchestrates dozens of document operations—from classic Word to
+              PDF conversions to advanced compression, merge, and e-sign prep—inside a
+              clean, modern workspace.
+            </p>
+            <div class="cta-group">
+              <a class="btn btn-primary" href="converter.html">Launch the workspace</a>
+              <a class="btn btn-tertiary" href="home.html">See the product tour</a>
+            </div>
+            <dl class="hero-metrics">
+              <div>
+                <dt>40K+</dt>
+                <dd>documents processed daily</dd>
+              </div>
+              <div>
+                <dt>12</dt>
+                <dd>conversion + optimization recipes</dd>
+              </div>
+              <div>
+                <dt>&lt; 5s</dt>
+                <dd>average simulated turnaround</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="workspace-preview">
+              <div class="workspace-preview__header">
+                <span class="status status--ready">Ready</span>
+                <span class="workspace-preview__name">DocuShift Workspace</span>
+              </div>
+              <div class="workspace-preview__grid">
+                <span class="workspace-preview__tile">Word → PDF</span>
+                <span class="workspace-preview__tile">PDF → Word</span>
+                <span class="workspace-preview__tile">PDF Merge</span>
+                <span class="workspace-preview__tile">Image → PDF</span>
+                <span class="workspace-preview__tile">PDF Compress</span>
+                <span class="workspace-preview__tile">PDF → PPT</span>
+              </div>
+              <p class="workspace-preview__hint">Switch recipes instantly with rich validation.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-section" aria-labelledby="feature-heading">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="feature-heading">One workspace. Every document workflow.</h2>
+            <p>
+              Jump between conversions, clean-up jobs, and delivery prep using the same
+              intuitive controls. DocuShift brings powerful automation to the front end
+              so teams can prototype instantly.
+            </p>
+          </header>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>Universal conversions</h3>
+              <p>
+                Simulate cross-format conversions for Word, PowerPoint, Excel, imagery,
+                PDFs, and presentation rebuilds with one consistent upload experience.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Operational extras</h3>
+              <p>
+                Test PDF merge, compression, and signing prep recipes without touching
+                backend code—perfect for validating your automation pipeline.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Guided validation</h3>
+              <p>
+                Every recipe updates file type validation, messaging, and call-to-action
+                copy so users never guess what to upload or expect in return.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Team-friendly handoff</h3>
+              <p>
+                Export the mock download links or wire up your API in minutes with clear
+                hooks and backend integration notes on every page.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="operations" aria-labelledby="operations-heading">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="operations-heading">Choose a quick-start recipe</h2>
+            <p>Each tile opens the workspace with the right preset, validation, and copy.</p>
+          </header>
+          <div class="conversion-grid conversion-grid--expanded">
+            <a class="conversion-tile" href="converter.html?type=word-to-pdf">
+              <span class="conversion-tile__title">Word to PDF</span>
+              <span class="conversion-tile__meta">.docx → .pdf</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=ppt-to-pdf">
+              <span class="conversion-tile__title">PowerPoint to PDF</span>
+              <span class="conversion-tile__meta">.pptx → .pdf</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=xls-to-pdf">
+              <span class="conversion-tile__title">Excel to PDF</span>
+              <span class="conversion-tile__meta">.xlsx → .pdf</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=image-to-pdf">
+              <span class="conversion-tile__title">Images to PDF</span>
+              <span class="conversion-tile__meta">.png/.jpg → .pdf</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-to-word">
+              <span class="conversion-tile__title">PDF to Word</span>
+              <span class="conversion-tile__meta">.pdf → .docx</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-to-ppt">
+              <span class="conversion-tile__title">PDF to PowerPoint</span>
+              <span class="conversion-tile__meta">.pdf → .pptx</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-merge">
+              <span class="conversion-tile__title">Merge PDFs</span>
+              <span class="conversion-tile__meta">Combine multiple .pdf files</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-compress">
+              <span class="conversion-tile__title">Compress PDF</span>
+              <span class="conversion-tile__meta">Reduce file size</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-sign">
+              <span class="conversion-tile__title">Prep for e-sign</span>
+              <span class="conversion-tile__meta">Tag &amp; send PDF</span>
+            </a>
+            <a class="conversion-tile" href="converter.html?type=pdf-ocr">
+              <span class="conversion-tile__title">OCR Scans</span>
+              <span class="conversion-tile__meta">.pdf → searchable .pdf</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow" aria-labelledby="workflow-heading">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="workflow-heading">Prototype the complete delivery chain</h2>
+            <p>
+              Map your internal process—from upload through final delivery—using the
+              pre-built steps below. Each stage mirrors best practices we ship with our
+              production SDKs.
+            </p>
+          </header>
+          <ol class="workflow-steps">
+            <li>
+              <span class="step-number">1</span>
+              <div>
+                <h3>Collect + validate</h3>
+                <p>
+                  Guided uploads ensure contributors provide the right file type and
+                  optional metadata, with inline hints you can customize.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              <div>
+                <h3>Transform + enhance</h3>
+                <p>
+                  Toggle compression, OCR, merge, and cross-format conversions while we
+                  simulate the progress flow for your team demo.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              <div>
+                <h3>Deliver + hand off</h3>
+                <p>
+                  Generate mock download links, share via integrations, or connect your
+                  API endpoint to ship real files when you are ready.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="integrations" aria-labelledby="integrations-heading">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="integrations-heading">Plays nicely with your stack</h2>
+            <p>
+              Whether you serve internal teams or thousands of customers, DocuShift slots
+              into modern tooling with instant export options.
+            </p>
+          </header>
+          <div class="integration-grid">
+            <article>
+              <h3>Cloud storage</h3>
+              <p>Route converted files to S3, Azure Blob, or Google Cloud Storage.</p>
+            </article>
+            <article>
+              <h3>Productivity suites</h3>
+              <p>Push downloads into Slack, Microsoft Teams, or shared Drives.</p>
+            </article>
+            <article>
+              <h3>APIs + webhooks</h3>
+              <p>
+                Prototype webhook payloads, signed URLs, and custom metadata for your
+                production integration.
+              </p>
+            </article>
+            <article>
+              <h3>Compliance ready</h3>
+              <p>
+                Simulated flows demonstrate SOC 2, HIPAA, and GDPR-friendly document
+                retention practices.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="testimonial" aria-labelledby="testimonial-heading">
+        <div class="container testimonial-container">
+          <div class="testimonial-quote">
+            <h2 id="testimonial-heading">Teams stay on track with DocuShift</h2>
+            <blockquote>
+              “Our operations managers can demo new PDF workflows in minutes. The
+              conversion presets and automation notes made development handoff effortless.”
+            </blockquote>
+            <cite>— Priya Patel, Director of Solutions, Brightline Legal</cite>
+          </div>
+          <aside class="testimonial-aside">
+            <h3>Rollout checklist</h3>
+            <ul>
+              <li>Launch workspace with the correct recipe.</li>
+              <li>Customize validation hints and CTAs.</li>
+              <li>Connect mock download to your API.</li>
+              <li>Roll into QA and watch the status dashboard light up.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="cta" aria-labelledby="cta-heading">
+        <div class="container cta-content">
+          <div>
+            <h2 id="cta-heading">Ready to modernize document handling?</h2>
+            <p>
+              Spin up DocuShift, validate every critical workflow, and ship polished
+              document automation in record time.
+            </p>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="converter.html">Open the workspace</a>
+            <a class="btn btn-outline" href="home.html">Explore the tour</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <p>&copy; <span id="footerYear"></span> DocuShift. All rights reserved.</p>
+        <a href="home.html" class="footer-link">Learn more</a>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
