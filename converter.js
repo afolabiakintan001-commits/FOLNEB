@@ -25,6 +25,23 @@
   const downloadBlob = (blob, name) => { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.className = 'download-link'; a.textContent = `Download ${name}`; result.appendChild(a); a.focus(); setTimeout(() => URL.revokeObjectURL(url), 30_000); };
   const blobFromPdfLibDoc = async (doc) => new Blob([await doc.save()], { type: 'application/pdf' });
 
+  // Optional tiny brand stamp on first page (default off)
+  async function brandStamp(pdfBytes){
+    try {
+      if (!window.PDFLib) return pdfBytes;
+      const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+      const logoBytes = await (await fetch('src/assets/images/FOLNEB-logo-transparent.png')).arrayBuffer();
+      const png = await pdfDoc.embedPng(logoBytes);
+      const page = pdfDoc.getPage(0);
+      const { width } = page.getSize();
+      const scale = 24 / png.height;
+      page.drawImage(png, { x: width - 36, y: 12, width: png.width * scale, height: png.height * scale, opacity: 0.85 });
+      return await pdfDoc.save();
+    } catch {
+      return pdfBytes;
+    }
+  }
+
   const renderHtmlToPdf = async (htmlOrEl) => {
     const { jsPDF } = window.jspdf || {}; if (!jsPDF) throw new Error('jsPDF not loaded'); if (!window.html2canvas) throw new Error('html2canvas not loaded');
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -68,7 +85,7 @@
       console.warn('[FOLNEB] server path failed; falling back', e);
     }
   } else {
-    console.log('[FOLNEB] no server endpoint configured — using client fallback');
+    console.log('[FOLNEB] no server endpoint configured ï¿½ using client fallback');
   }
 
   // Client fallback (Mammoth -> html2canvas + jsPDF)
@@ -128,7 +145,12 @@
     for(const f of files){ if(f.size>MAX) return void result.appendChild((()=>{const p=document.createElement('p');p.className='error';p.textContent='File exceeds 100MB limit.';return p;})()); if(!matches(f,cfg.accept)) return void result.appendChild((()=>{const p=document.createElement('p');p.className='error';p.textContent=`This tool accepts: ${cfg.accept}`;return p;})()); }
     setBusy(true,cfg.buttonIdle,cfg.buttonBusy); const started=performance.now(); console.log('[FOLNEB] Job start',{type,files:files.map(f=>({name:f.name,size:f.size}))});
     try{
-      const out=await cfg.handler(files,cfg); const blob=out.blob; const name=out.suggestedName||createName(files[0]?.name, cfg.outputExtension||'.pdf');
+      const out=await cfg.handler(files,cfg); let blob=out.blob; const name=out.suggestedName||createName(files[0]?.name, cfg.outputExtension||'.pdf');
+      if (window.FOLNEB_BRAND_STAMP === true && (name.toLowerCase().endsWith('.pdf') || (blob && (blob.type||'').includes('pdf')))){
+        const bytes = await blob.arrayBuffer();
+        const stamped = await brandStamp(bytes);
+        blob = new Blob([stamped], { type: 'application/pdf' });
+      }
       const msg=document.createElement('p'); msg.className='result-message'; msg.textContent='Your file is ready.'; result.appendChild(msg);
       downloadBlob(blob,name);
       if (window.pdfjsLib){ const btn=document.createElement('button'); btn.type='button'; btn.className='btn btn-outline'; btn.textContent='Preview'; btn.addEventListener('click',()=>openPreview(blob)); result.appendChild(btn); }

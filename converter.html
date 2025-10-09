@@ -8,12 +8,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="main.css" />
-  </head>
+  <link rel="icon" type="image/png" sizes="32x32" href="src/assets/images/FOLNEB-logo.png">
+<link rel="apple-touch-icon" href="src/assets/images/FOLNEB-logo.png">
+<meta name="theme-color" content="#0f172a">
+<link rel="preload" as="image" href="src/assets/images/FOLNEB-horizontal.png" imagesrcset="src/assets/images/FOLNEB-horizontal.png 1x" fetchpriority="high">
+
 
   <body class="page page--workspace">
     <header class="site-header">
       <div class="container header-content">
-        <a class="logo" href="index.html">FOLNEB</a>
+        <a class="logo" href="index.html" aria-label="FOLNEB"><img src="src/assets/images/FOLNEB-horizontal.png" width="180" height="61" alt="FOLNEB" loading="eager" decoding="async" /></a>
         <nav class="site-nav" aria-label="Main navigation">
           <ul>
             <li><a href="index.html">Overview</a></li>
@@ -146,7 +150,7 @@
 
     <footer class="site-footer">
       <div class="container footer-content">
-        <p>&copy; <span id="workspaceYear"></span> FOLNEB. All rights reserved.</p>
+        <img src="src/assets/images/FOLNEB-logo-transparent.png" alt="" width="20" height="20" style="opacity:.9;vertical-align:middle;margin-right:.5rem"><p>&copy; <span id="workspaceYear"></span> FOLNEB. All rights reserved.</p>
         <a href="home.html" class="footer-link">Explore the tour</a>
       </div>
     </footer>
@@ -156,7 +160,7 @@
     </script>
 
     <!-- Configure API endpoint (replace with your deployed proxy URL) -->
-    <script>window.FOLNEB_API = "/convert/docx-to-pdf";</script>
+    <script>window.FOLNEB_API = "/convert/docx-to-pdf";</script>`n    <script>window.FOLNEB_BRAND_STAMP=false</script>
 
     <!-- ===== VENDOR LIBS (CDN) ===== -->
     <!-- PDF.js + worker -->
