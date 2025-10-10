@@ -60,7 +60,7 @@
                       <option value="pdf-ocr">OCR a scanned PDF</option>
                     </select>
                   </div>
-                  <p class="conversion-summary" id="conversionSummary">Word → PDF — Preserve your document formatting and fonts.</p>
+                  <p class="conversion-summary" id="conversionSummary">Word Ã¢â€ â€™ PDF Ã¢â‚¬â€ Preserve your document formatting and fonts.</p>
                 </div>
 
                 <div class="file-input">
@@ -84,7 +84,7 @@
 
             <div class="progress">
               <div id="spinner" class="spinner" role="status" aria-live="polite" aria-hidden="true" hidden>
-                <span class="visually-hidden">Processing your document…</span>
+                <span class="visually-hidden">Processing your documentÃ¢â‚¬Â¦</span>
               </div>
               <div id="result" class="result" role="status" aria-live="polite"></div>
             </div>
@@ -95,8 +95,8 @@
               <h2>Recipe guide</h2>
               <p>Deep links launch the workspace with the proper configuration. Use them to demo or bookmark your most common flows.</p>
               <div class="quick-links">
-                <a href="converter.html?type=word-to-pdf">Word → PDF</a>
-                <a href="converter.html?type=pdf-to-word">PDF → Word</a>
+                <a href="converter.html?type=word-to-pdf">Word Ã¢â€ â€™ PDF</a>
+                <a href="converter.html?type=pdf-to-word">PDF Ã¢â€ â€™ Word</a>
                 <a href="converter.html?type=pdf-merge">Merge PDFs</a>
                 <a href="converter.html?type=pdf-compress">Compress PDF</a>
                 <a href="converter.html?type=pdf-ocr">OCR PDF</a>
@@ -160,31 +160,43 @@
     </script>
 
     <!-- Configure API endpoint (replace with your deployed proxy URL) -->
-    <script>window.FOLNEB_API = "/convert/docx-to-pdf";</script>`n    <script>window.FOLNEB_BRAND_STAMP=false</script>
+    <script>window.FOLNEB_API = "/convert/docx-to-pdf";</script>
+    <!-- Optional brand stamp on PDFs (default off) -->
+    <script>window.FOLNEB_BRAND_STAMP=false</script>
 
     <!-- ===== VENDOR LIBS (CDN) ===== -->
     <!-- PDF.js + worker -->
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script>
       if (window.pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-          'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
       }
     </script>
-
-    <!-- html2canvas (REQUIRED for jsPDF doc.html) -->
+    <!-- html2canvas for jsPDF doc.html -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-    <!-- PDF creation + utilities -->
+    <!-- PDF creation libs -->
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
     <!-- Converters -->
     <script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
-
+    <!-- CDN fallbacks to local copies (if any CDN fails) -->
+    <script>
+      (function(){
+        function inject(src){ var s=document.createElement('script'); s.src=src; s.defer=false; document.currentScript.parentNode.insertBefore(s, document.currentScript); }
+        if(!window.pdfjsLib) inject('src/js/lib/pdf.min.js');
+        if(!window.html2canvas) inject('src/js/lib/html2canvas.min.js');
+        if(!window.PDFLib) inject('src/js/lib/pdf-lib.min.js');
+        if(!(window.jspdf||window.jsPDF)) inject('src/js/lib/jspdf.umd.min.js');
+        if(!window.mammoth) inject('src/js/lib/mammoth.min.js');
+        if(!window.XLSX) inject('src/js/lib/xlsx.full.min.js');
+        if(!window.Tesseract) inject('src/js/lib/tesseract.min.js');
+        if(!window.JSZip) inject('src/js/lib/jszip.min.js');
+        setTimeout(function(){ if(window.pdfjsLib && (!pdfjsLib.GlobalWorkerOptions.workerSrc || pdfjsLib.GlobalWorkerOptions.workerSrc.indexOf('pdf.worker')===-1)) { pdfjsLib.GlobalWorkerOptions.workerSrc='src/js/lib/pdf.worker.min.js'; } }, 0);
+      })();
+    </script>
     <!-- ===== APP SCRIPTS (after vendors) ===== -->
     <script src="main.js"></script>
     <script src="converter.js"></script>

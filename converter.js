@@ -168,11 +168,23 @@
   // Handlers
   const handlers = {};
 
-  handlers['word-to-pdf'] = async (files) => {
-    if (!window.mammoth) throw new Error('Mammoth not loaded');
+  handlers['word-to-pdf'] = async (files, cfg) => {
     const file = files[0];
     if (!/\.docx$/i.test(file.name)) throw new Error('Use a .docx file');
-
+    const api = (typeof window !== 'undefined' && window.FOLNEB_API) ? String(window.FOLNEB_API) : '';
+    if (api) {
+      try {
+        const resp = await fetch(api, { method: 'POST', headers: { 'X-Filename': file.name }, body: file, signal: cfg && cfg.signal });
+        if (!resp.ok) throw new Error(`Server convert failed (${resp.status})`);
+        const ct = resp.headers.get('content-type') || '';
+        if (!ct.includes('pdf')) throw new Error('Server did not return a PDF');
+        const blob = await resp.blob();
+        return { blob, suggestedName: createDownloadName(file.name, '.pdf') };
+      } catch (e) {
+        if (e && e.name === 'AbortError') throw e; // canceled
+      }
+    }
+    if (!window.mammoth) throw new Error('Mammoth not loaded');
     const ab = await readFileAsArrayBuffer(file);
     const styleMap = [
       "p[style-name='Title'] => p.mso-title:fresh",
@@ -182,30 +194,15 @@
       "p[style-name='Heading 3'] => h3:fresh",
       "r[style-name='Strong'] => strong",
       "r[style-name='Emphasis'] => em",
-      'table => table',
-      'tr => tr',
-      'tc => td'
+      'table => table','tr => tr','tc => td'
     ].join('\n');
-
     const res = await window.mammoth.convertToHtml(
       { arrayBuffer: ab },
-      {
-        includeDefaultStyleMap: true,
-        styleMap,
-        convertImage: window.mammoth.images.inline((elem) =>
-          elem.read('base64').then((data) => ({
-            src: `data:${elem.contentType};base64,${data}`
-          }))
-        )
-      }
+      { includeDefaultStyleMap: true, styleMap,
+        convertImage: window.mammoth.images.inline((elem) => elem.read('base64').then((data) => ({ src: `data:${elem.contentType};base64,${data}` }))) }
     );
-
-    const el = document.createElement('div');
-    el.innerHTML = res.value;
-    if (!el.textContent.trim() && el.querySelectorAll('img').length === 0) {
-      throw new Error('No readable content found in DOCX.');
-    }
-
+    const el = document.createElement('div'); el.innerHTML = res.value;
+    if (!el.textContent.trim() && el.querySelectorAll('img').length === 0) throw new Error('No readable content found in DOCX.');
     const blob = await renderHtmlToPdf(el);
     return { blob, suggestedName: createDownloadName(file.name, '.pdf') };
   };
@@ -395,8 +392,11 @@
     const loadingTask = window.pdfjsLib.getDocument({ data: new Uint8Array(ab) });
     const pdf = await loadingTask.promise;
     const out = await window.PDFLib.PDFDocument.create();
+    const maxInput = document.getElementById('ocrMaxPages');
+    const req = Math.max(1, parseInt((maxInput && maxInput.value) || '12', 10));
+    const limit = Math.min(pdf.numPages, req);
 
-    for (let p = 1; p <= pdf.numPages; p++) {
+    for (let p = 1; p <= limit; p++) {
       const page = await pdf.getPage(p);
       const viewport = page.getViewport({ scale: 2.0 });
       const canvas = document.createElement('canvas');
@@ -565,7 +565,14 @@
     } else if (type === 'pdf-compress') {
       advancedNote.textContent = 'Large PDFs may be slow — try splitting first.';
     } else if (type === 'pdf-ocr') {
-      advancedNote.textContent = 'OCR uses Tesseract.js (English).';
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      label.setAttribute('for', 'ocrMaxPages');
+      label.textContent = 'Max pages to OCR (default 12)';
+      const input = document.createElement('input');
+      input.id = 'ocrMaxPages'; input.type = 'number'; input.min = '1'; input.value = '12'; input.style.width='6rem';
+      li.appendChild(label); li.appendChild(input); advancedOptionsList.appendChild(li);
+      advancedNote.textContent = 'OCR uses Tesseract.js (English). Large files may be slow.';
     }
   };
 
@@ -631,6 +638,20 @@
       }
     }
 
+    // Optional cancel for server Word->PDF
+    let controller = null;
+    let cancelBtn = null;
+    if (type === 'word-to-pdf' && window.FOLNEB_API) {
+      controller = new AbortController();
+      cfg.signal = controller.signal;
+      cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'btn btn-outline';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', () => controller && controller.abort());
+      result.appendChild(cancelBtn);
+    }
+
     showBusy(true, cfg.buttonIdle, cfg.buttonBusy);
     const startedAt = performance.now();
 
@@ -662,10 +683,11 @@
         // ignore telemetry failures
       }
     } catch (err) {
-      const message = err && err.message ? err.message : 'Something went wrong.';
+      const message = err && err.name === 'AbortError' ? 'Canceled.' : (err && err.message ? err.message : 'Something went wrong.');
       result.appendChild(createError(message));
     } finally {
       showBusy(false, cfg.buttonIdle, cfg.buttonBusy);
+      if (cancelBtn) try { cancelBtn.remove(); } catch {}
     }
   });
 
@@ -680,6 +702,19 @@
       localStorage.setItem('folneb:recent', JSON.stringify(updated));
     } catch (e) {}
   });
+
+  // Drag & Drop support on the form (no HTML changes)
+  function setDroppedFiles(fileList){
+    try {
+      const dt = new DataTransfer();
+      Array.from(fileList).forEach(f => dt.items.add(f));
+      sourceFileInput.files = dt.files;
+      const event = new Event('change');
+      sourceFileInput.dispatchEvent(event);
+    } catch { /* noop */ }
+  }
+  converterForm.addEventListener('dragover', (ev) => { ev.preventDefault(); });
+  converterForm.addEventListener('drop', (ev) => { ev.preventDefault(); if(ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length){ setDroppedFiles(ev.dataTransfer.files); } });
 
   const initialType =
     (localStorage.getItem('folneb:type') ||
