@@ -412,7 +412,9 @@
       pageOut.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
 
       if (window.Tesseract) {
-        const { data } = await window.Tesseract.recognize(canvas, 'eng');
+        const langEl = document.getElementById('ocrLang');
+        const lang = (langEl && langEl.value) || 'eng';
+        const { data } = await window.Tesseract.recognize(canvas, lang);
         const words = data.words || [];
         const font = await out.embedFont(window.PDFLib.StandardFonts.Helvetica);
         words.forEach((w) => {
@@ -565,14 +567,24 @@
     } else if (type === 'pdf-compress') {
       advancedNote.textContent = 'Large PDFs may be slow — try splitting first.';
     } else if (type === 'pdf-ocr') {
-      const li = document.createElement('li');
-      const label = document.createElement('label');
-      label.setAttribute('for', 'ocrMaxPages');
-      label.textContent = 'Max pages to OCR (default 12)';
-      const input = document.createElement('input');
-      input.id = 'ocrMaxPages'; input.type = 'number'; input.min = '1'; input.value = '12'; input.style.width='6rem';
-      li.appendChild(label); li.appendChild(input); advancedOptionsList.appendChild(li);
-      advancedNote.textContent = 'OCR uses Tesseract.js (English). Large files may be slow.';
+      const li1 = document.createElement('li');
+      const label1 = document.createElement('label');
+      label1.setAttribute('for', 'ocrMaxPages');
+      label1.textContent = 'Max pages to OCR (default 12)';
+      const input1 = document.createElement('input');
+      input1.id = 'ocrMaxPages'; input1.type = 'number'; input1.min = '1'; input1.value = '12'; input1.style.width='6rem';
+      li1.appendChild(label1); li1.appendChild(input1); advancedOptionsList.appendChild(li1);
+
+      const li2 = document.createElement('li');
+      const label2 = document.createElement('label');
+      label2.setAttribute('for', 'ocrLang');
+      label2.textContent = 'Language';
+      const sel = document.createElement('select');
+      sel.id = 'ocrLang';
+      ['eng','spa','fra','deu','ita','por'].forEach(code => { const o=document.createElement('option'); o.value=code; o.textContent=code; sel.appendChild(o); });
+      li2.appendChild(label2); li2.appendChild(sel); advancedOptionsList.appendChild(li2);
+
+      advancedNote.textContent = 'OCR uses Tesseract.js (default: eng). Large files may be slow.';
     }
   };
 
