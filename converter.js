@@ -1,4 +1,4 @@
-// FOLNEB Converter — real client-side conversions + UI wiring
+// FOLNEB Converter Ã¢â‚¬â€ real client-side conversions + UI wiring
 // Requires vendor CDNs loaded in converter.html: pdfjs-dist (+worker), html2canvas, pdf-lib, jsPDF, Mammoth, XLSX, JSZip, Tesseract
 (function () {
   'use strict';
@@ -48,7 +48,7 @@
     a.href = url;
     a.download = filename;
     a.className = 'download-link';
-    a.textContent = `⬇ Download ${filename}`;
+    a.textContent = `Ã¢Â¬â€¡ Download ${filename}`;
     result.appendChild(a);
     a.focus();
   };
@@ -307,33 +307,7 @@
     return { blob, suggestedName: 'merged.pdf' };
   };
 
-  handlers['pdf-split'] = async (files) => {
-    const file = files[0];
-    const ab = await readFileAsArrayBuffer(file);
-    const src = await window.PDFLib.PDFDocument.load(ab);
-    const total = src.getPageCount();
-    const rangeInput = document.getElementById('splitRanges');
-    const ranges = parseRanges((rangeInput && rangeInput.value) || `1-${total}`);
-    if (ranges.length === 0) throw new Error('Enter page ranges like 1-3,5');
-
-    const zip = new window.JSZip();
-    let idx = 1;
-    for (const [s, e] of ranges) {
-      const from = Math.max(1, s);
-      const to = Math.min(e, total);
-      const sub = await window.PDFLib.PDFDocument.create();
-      const pages = await sub.copyPages(
-        src,
-        Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i)
-      );
-      pages.forEach((p) => sub.addPage(p));
-      const bytes = await sub.save();
-      zip.file(`split_${idx}.pdf`, bytes);
-      idx += 1;
-    }
-    const blob = await zip.generateAsync({ type: 'blob' });
-    return { blob, suggestedName: createDownloadName(file.name, '_split.zip') };
-  };
+  handlers['pdf-split'] = async (files) => {\n    const file = files[0];\n    const ab = await readFileAsArrayBuffer(file);\n    const src = await window.PDFLib.PDFDocument.load(ab);\n    const total = src.getPageCount();\n    const rangeInput = document.getElementById('splitRanges');\n    const ranges = parseRanges((rangeInput && rangeInput.value) || 1-);\n    if (ranges.length === 0) throw new Error('Enter page ranges like 1-3,5');\n\n    const zip = new window.JSZip();\n    let idx = 1; let clamped=false;\n    for (const [s, e] of ranges) {\n      const from = Math.max(1, s);\n      const to = Math.min(e, total);\n      if (from!==s || to!==e) clamped = true;\n      const sub = await window.PDFLib.PDFDocument.create();\n      const pages = await sub.copyPages(src, Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i));\n      pages.forEach((p) => sub.addPage(p));\n      const bytes = await sub.save();\n      zip.file(split_.pdf, bytes);\n      idx += 1;\n    }\n    if (clamped) try{ if (typeof window.FOLNEB_LOG==='function') window.FOLNEB_LOG('split:clamped',{ total, ranges }); }catch{}\n    const blob = await zip.generateAsync({ type: 'blob' });\n    return { blob, suggestedName: createDownloadName(file.name, '_split.zip') };\n  };
 
   handlers['pdf-compress'] = async (files) => {
     const file = files[0];
@@ -439,8 +413,8 @@
       outputExtension: '.pdf',
       handler: handlers['word-to-pdf'],
       buttonIdle: 'Convert to PDF',
-      buttonBusy: 'Converting…',
-      summary: 'Word → PDF — Preserve formatting (client-side, close match).',
+      buttonBusy: 'ConvertingÃ¢â‚¬Â¦',
+      summary: 'Word Ã¢â€ â€™ PDF Ã¢â‚¬â€ Preserve formatting (client-side, close match).',
       fileLabel: 'Select a Word document',
       fileHint: 'Supported: .docx',
       multiple: false
@@ -450,8 +424,8 @@
       outputExtension: '.docx',
       handler: handlers['pdf-to-word'],
       buttonIdle: 'Convert to Word',
-      buttonBusy: 'Converting…',
-      summary: 'PDF → Word — Text-only DOCX.',
+      buttonBusy: 'ConvertingÃ¢â‚¬Â¦',
+      summary: 'PDF Ã¢â€ â€™ Word Ã¢â‚¬â€ Text-only DOCX.',
       fileLabel: 'Select a PDF file',
       fileHint: 'Supported: .pdf',
       multiple: false
@@ -461,8 +435,8 @@
       outputExtension: '.pdf',
       handler: handlers['ppt-to-pdf'],
       buttonIdle: 'Convert to PDF',
-      buttonBusy: 'Converting…',
-      summary: 'PowerPoint → PDF — Image-based preview.',
+      buttonBusy: 'ConvertingÃ¢â‚¬Â¦',
+      summary: 'PowerPoint Ã¢â€ â€™ PDF Ã¢â‚¬â€ Image-based preview.',
       fileLabel: 'Select a PPTX file',
       fileHint: 'Supported: .pptx',
       multiple: false
@@ -472,8 +446,8 @@
       outputExtension: '.pdf',
       handler: handlers['xls-to-pdf'],
       buttonIdle: 'Convert to PDF',
-      buttonBusy: 'Converting…',
-      summary: 'Excel → PDF — First sheet to table.',
+      buttonBusy: 'ConvertingÃ¢â‚¬Â¦',
+      summary: 'Excel Ã¢â€ â€™ PDF Ã¢â‚¬â€ First sheet to table.',
       fileLabel: 'Select an Excel file',
       fileHint: 'Supported: .xls, .xlsx',
       multiple: false
@@ -483,8 +457,8 @@
       outputExtension: '.pdf',
       handler: handlers['image-to-pdf'],
       buttonIdle: 'Convert to PDF',
-      buttonBusy: 'Converting…',
-      summary: 'Images → PDF — Multi-page.',
+      buttonBusy: 'ConvertingÃ¢â‚¬Â¦',
+      summary: 'Images Ã¢â€ â€™ PDF Ã¢â‚¬â€ Multi-page.',
       fileLabel: 'Select image files',
       fileHint: 'Supported: .png, .jpg',
       multiple: true,
@@ -495,8 +469,8 @@
       outputExtension: '.pdf',
       handler: handlers['pdf-merge'],
       buttonIdle: 'Merge PDFs',
-      buttonBusy: 'Merging…',
-      summary: 'PDF Merge — Keep upload order.',
+      buttonBusy: 'MergingÃ¢â‚¬Â¦',
+      summary: 'PDF Merge Ã¢â‚¬â€ Keep upload order.',
       fileLabel: 'Select PDF files',
       fileHint: 'Supported: .pdf (2+)',
       multiple: true,
@@ -505,48 +479,7 @@
     'pdf-split': {
       accept: '.pdf,application/pdf',
       outputExtension: '.zip',
-      handler: handlers['pdf-split'],
-      buttonIdle: 'Split PDF',
-      buttonBusy: 'Splitting…',
-      summary: 'PDF Split — Enter page ranges.',
-      fileLabel: 'Select a PDF file',
-      fileHint: 'Supported: .pdf',
-      multiple: false
-    },
-    'pdf-compress': {
-      accept: '.pdf,application/pdf',
-      outputExtension: '.pdf',
-      handler: handlers['pdf-compress'],
-      buttonIdle: 'Compress PDF',
-      buttonBusy: 'Compressing…',
-      summary: 'PDF Compress — Re-encode pages.',
-      fileLabel: 'Select a PDF file',
-      fileHint: 'Supported: .pdf',
-      multiple: false
-    },
-    'pdf-sign': {
-      accept: '.pdf,application/pdf',
-      outputExtension: '.pdf',
-      handler: handlers['pdf-sign'],
-      buttonIdle: 'Prepare for e-sign',
-      buttonBusy: 'Tagging…',
-      summary: 'E-Sign Prep — Signature/initials/date boxes.',
-      fileLabel: 'Select a PDF file',
-      fileHint: 'Supported: .pdf',
-      multiple: false
-    },
-    'pdf-ocr': {
-      accept: '.pdf,application/pdf',
-      outputExtension: '.pdf',
-      handler: handlers['pdf-ocr'],
-      buttonIdle: 'OCR PDF',
-      buttonBusy: 'Running OCR…',
-      summary: 'OCR — Make scans searchable.',
-      fileLabel: 'Select a scanned PDF',
-      fileHint: 'Supported: .pdf',
-      multiple: false
-    }
-  };
+      handler: handlers['pdf-split'] = async (files) => {\n    const file = files[0];\n    const ab = await readFileAsArrayBuffer(file);\n    const src = await window.PDFLib.PDFDocument.load(ab);\n    const total = src.getPageCount();\n    const rangeInput = document.getElementById('splitRanges');\n    const ranges = parseRanges((rangeInput && rangeInput.value) || 1-);\n    if (ranges.length === 0) throw new Error('Enter page ranges like 1-3,5');\n\n    const zip = new window.JSZip();\n    let idx = 1; let clamped=false;\n    for (const [s, e] of ranges) {\n      const from = Math.max(1, s);\n      const to = Math.min(e, total);\n      if (from!==s || to!==e) clamped = true;\n      const sub = await window.PDFLib.PDFDocument.create();\n      const pages = await sub.copyPages(src, Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i));\n      pages.forEach((p) => sub.addPage(p));\n      const bytes = await sub.save();\n      zip.file(split_.pdf, bytes);\n      idx += 1;\n    }\n    if (clamped) try{ if (typeof window.FOLNEB_LOG==='function') window.FOLNEB_LOG('split:clamped',{ total, ranges }); }catch{}\n    const blob = await zip.generateAsync({ type: 'blob' });\n    return { blob, suggestedName: createDownloadName(file.name, '_split.zip') };\n  };
 
   const renderEnhancements = (type) => {
     advancedOptionsList.innerHTML = '';
@@ -555,17 +488,10 @@
       const li = document.createElement('li');
       const label = document.createElement('label');
       label.setAttribute('for', 'splitRanges');
-      label.textContent = 'Page ranges (e.g., 1-3,5)';
-      const input = document.createElement('input');
-      input.id = 'splitRanges';
-      input.type = 'text';
-      input.placeholder = '1-3,5';
-      li.appendChild(label);
-      li.appendChild(input);
-      advancedOptionsList.appendChild(li);
+      label.textContent = 'Page ranges (e.g., 1-3,5)';\n      const input = document.createElement('input');\n      input.id = 'splitRanges';\n      input.type = 'text';\n      input.placeholder = '1-3,5';\n      li.appendChild(label);\n      li.appendChild(input);\n      const validate=document.createElement('button');\n      validate.type='button'; validate.className='btn btn-outline'; validate.textContent='Validate ranges';\n      validate.addEventListener('click', async ()=>{ const files=sourceFileInput.files||[]; if(!files.length) return; try{ const ab=await readFileAsArrayBuffer(files[0]); const pdf=await window.PDFLib.PDFDocument.load(ab); const total=pdf.getPageCount(); const ranges=parseRanges(input.value||1-); const bad=ranges.filter(([s,e])=> s<1||e>total||s>e); advancedNote.textContent = bad.length? Some ranges out of 1- will be clamped. : Valid. Document has  pages.; } catch { advancedNote.textContent='Unable to validate ranges.'; } });\n      li.appendChild(validate);\n      advancedOptionsList.appendChild(li);
       advancedNote.textContent = 'Ranges outside bounds are clamped.';
     } else if (type === 'pdf-compress') {
-      advancedNote.textContent = 'Large PDFs may be slow — try splitting first.';
+      advancedNote.textContent = 'Large PDFs may be slow Ã¢â‚¬â€ try splitting first.';
     } else if (type === 'pdf-ocr') {
       const li1 = document.createElement('li');
       const label1 = document.createElement('label');
