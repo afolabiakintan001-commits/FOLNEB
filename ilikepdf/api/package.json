@@ -1,0 +1,17 @@
+{
+  "name": "ilikepdf-api",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.676.0",
+    "@aws-sdk/s3-request-presigner": "^3.676.0",
+    "bullmq": "^5.7.11",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": { "tsx": "^4.19.2", "typescript": "^5.6.3" }
+}
+
