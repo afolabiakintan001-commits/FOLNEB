@@ -91,5 +91,5 @@
     </footer>
 
     <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
-  </body>
-</html>
+  <script>if ('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
+
